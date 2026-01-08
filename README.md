@@ -7,7 +7,7 @@ schema is defined with the help of a simple and small ORM called [peewee](https:
 ## Installation
 
 ```
-pip install git+https://github.com/PrivateAIM/node-event-logging-database.git@v0.1.0
+pip install git+https://github.com/PrivateAIM/node-event-logging-database.git@v0.1.1
 ```
 
 

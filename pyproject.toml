@@ -1,6 +1,6 @@
 [project]
 name = "node-event-logging-database"
-version = "0.1.0"
+version = "0.1.1"
 description = "Database schema to store events node-sided."
 authors = [
     {name = "Paul Brassel", email = "Paul.Brassel@medizin.uni-leipzig.de"}
