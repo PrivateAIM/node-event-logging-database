@@ -1,0 +1,10 @@
+services:
+
+  postgres:
+    image: postgres:17.2
+    environment:
+      - "POSTGRES_USER=${POSTGRES_USER:-flame}"
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-s3cr3t_p4ssw0rd}"
+      - "POSTGRES_DB=${POSTGRES_DB:-node_events}"
+    ports:
+      - "5432:5432"

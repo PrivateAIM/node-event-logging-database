@@ -1,26 +1,34 @@
 [project]
-name = "python-template-repo"
+name = "node-event-logging-database"
 version = "0.1.0"
-description = ""
+description = "Database schema to store events node-sided."
 authors = [
-    {name = "Maximilian Jugl", email = "Maximilian.Jugl@medizin.uni-leipzig.de"}
+    {name = "Paul Brassel", email = "Paul.Brassel@medizin.uni-leipzig.de"}
 ]
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "peewee (>=3.18.3,<4.0.0)",
+    "psycopg2-binary (>=2.9.11,<3.0.0)",
 ]
 license = "Apache-2.0"
 
 [tool.poetry]
-packages = [{ include = "project" }]
+packages = [{ include = "node_event_logging" }]
 
 [tool.poetry.group.dev.dependencies]
 pytest = ">=8.3.0"
 ruff = ">=0.9.0"
 pre-commit = ">=4.0.0"
+pytest-dotenv = "^0.5.2"
 
 [tool.ruff]
 line-length = 120
+
+[tool.pytest.ini_options]
+env_files = [
+    ".env.test",
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

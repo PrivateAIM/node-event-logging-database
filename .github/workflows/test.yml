@@ -2,6 +2,9 @@ name: Test
 
 env:
   DEFAULT_POETRY_VERSION: "2.1.0"
+  POSTGRES_USER: "flame"
+  POSTGRES_PASSWORD: "s3cr3t_p4ssw0rd"
+  POSTGRES_DB: "node_events"
 
 on:
   push:
@@ -33,3 +36,13 @@ jobs:
         run: poetry install --with dev
       - name: Test
         run: poetry run pytest -vra
+
+    services:
+      postgres:
+        image: postgres:17.2
+        env:
+          POSTGRES_USER: ${{env.POSTGRES_USER}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+        ports:
+          - 5432:5432
