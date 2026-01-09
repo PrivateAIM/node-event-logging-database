@@ -52,7 +52,7 @@ class EventLog(BaseModel):
 
     @classmethod
     def create(cls, **query):
-        # Validate event attributes before persisting based on event names.
+        # Validate event attributes based on event names before persisting.
         event_name = query.get("event_name", None)
         if event_name is not None:
             model = EventModelMap()(event_name=event_name)
