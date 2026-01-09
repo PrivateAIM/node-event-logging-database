@@ -55,7 +55,10 @@ class EventLog(BaseModel):
         event_name = query.get("event_name", None)
         if event_name is not None:
             model = EventModelMap()(event_name=event_name)
-            model(**query.get("attributes", {}))
+            attributes = query.get("attributes", {})
+            if not isinstance(attributes, dict):
+                raise ValueError(f"'attributes' need to be a dictionary, got {type(attributes)}.")
+            model(**attributes)
         super().create(**query)
 
 
