@@ -20,8 +20,7 @@ class EventLog(BaseModel):
     ----------
     event_name : str
         A name that identifies a certain type of events. This name should uniquely identify the event structure (both
-        body and attributes). This attribute is not nullable. This column is indexed to
-        improve query performance.
+        body and attributes). This attribute is not nullable. This column is indexed to improve query performance.
     service_name : str
         The name of the service that creates the event log. This is attribute is not nullable. This column is indexed to
         improve query performance.
