@@ -5,6 +5,8 @@ import peewee as pw
 from playhouse.postgres_ext import BinaryJSONField
 from playhouse.shortcuts import ThreadSafeDatabaseMetadata
 
+from .validation import EventModelMap
+
 
 class BaseModel(pw.Model):
     class Meta:
@@ -46,6 +48,15 @@ class EventLog(BaseModel):
     # Note that the binary JSON type only works with Postgres 9.4 or later.
     # https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#json-support
     attributes = BinaryJSONField(default=dict)
+
+    @classmethod
+    def create(cls, **query):
+        # Validate event attributes before persisting based on event names.
+        event_name = query.get("event_name", None)
+        if event_name is not None:
+            model = EventModelMap()(event_name=event_name)
+            model(**query.get("attributes", {}))
+        super().create(**query)
 
 
 @contextmanager
