@@ -34,7 +34,8 @@ class EventLog(BaseModel):
         Defaults to an empty string.
     attributes : dict
         Additional information about the event stored in a structured way so that they can be accessed easily by the UI.
-        Defaults to an empty dictionary.
+        Defaults to an empty dictionary. Dictionaries are validated by Pydantic models that are defined in the
+        validation module based on the corresponding name of the event.
 
     Notes
     -----
