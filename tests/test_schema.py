@@ -1,7 +1,11 @@
 import datetime
+import uuid
 
-from node_event_logging import bind_to, EventLog
-from .common.helpers import next_random_string
+import pytest
+from pydantic import ValidationError
+
+from node_event_logging import AttributesModel, bind_to, EventLog, EventModelMap
+from .common.helpers import next_random_string, next_uuid
 
 
 def test_database(postgres):
@@ -30,16 +34,58 @@ def test_create_and_delete(postgres):
 
         timestamp = datetime.datetime.now()
         body = next_random_string()
-        attributes = {next_random_string(): next_random_string()}
-        EventLog.create(
-            event_name=event_name, service_name=service_name, timestamp=timestamp, body=body, attributes=attributes
-        )
+        EventLog.create(event_name=event_name, service_name=service_name, timestamp=timestamp, body=body)
         assert EventLog.select().count() == n_events + 1
 
         event = EventLog.select().where(EventLog.event_name == event_name).get()
         assert event.timestamp == timestamp
         assert event.body == body
-        assert event.attributes == attributes
+
+        EventLog.delete().where(EventLog.event_name == event_name).execute()
+        assert EventLog.select().count() == n_events
+
+
+class AttributesModelTest(AttributesModel):
+    attribute: uuid.UUID
+
+
+def test_validating_attributes(monkeypatch, postgres):
+    event_name = next_random_string()
+    monkeypatch.setattr(EventModelMap, "mapping", {event_name: AttributesModelTest})
+
+    with bind_to(postgres):
+        with pytest.raises(ValidationError):
+            EventLog.create(
+                event_name=next_random_string(),
+                service_name=next_random_string(),
+                attributes={next_random_string(): next_random_string()},
+            )
+        with pytest.raises(ValidationError):
+            EventLog.create(
+                event_name=event_name,
+                service_name=next_random_string(),
+                attributes={next_random_string(): next_random_string()},
+            )
+        with pytest.raises(ValidationError):
+            EventLog.create(
+                event_name=event_name,
+                service_name=next_random_string(),
+                attributes={"attribute": next_random_string()},
+            )
+        with pytest.raises(ValidationError):
+            EventLog.create(
+                event_name=event_name,
+                service_name=next_random_string(),
+                attributes={"attribute": next_random_string(), next_random_string(): next_random_string()},
+            )
+
+        n_events = EventLog.select().count()
+        EventLog.create(
+            event_name=event_name,
+            service_name=next_random_string(),
+            attributes={"attribute": next_uuid()},
+        )
+        assert EventLog.select().count() == n_events + 1
 
         EventLog.delete().where(EventLog.event_name == event_name).execute()
         assert EventLog.select().count() == n_events
