@@ -28,11 +28,11 @@ class EventLog(BaseModel):
         The exact timestamp when the event took place. Defaults to the point in time when the event log is created. This
         column is indexed to improve query performance.
     body : str
-        A string containing the body of the event log, i.e. a human-readable string message (including multi-line). This
-        attribute is nullable.
+        A string containing the body of the event log, i.e. a human-readable string message (including multi-line).
+        Defaults to an empty string.
     attributes : dict
         Additional information about the event stored in a structured way so that they can be accessed easily by the UI.
-        This attribute is nullable.
+        Defaults to an empty dictionary.
 
     Notes
     -----
@@ -42,10 +42,10 @@ class EventLog(BaseModel):
     event_name = pw.CharField(index=True)
     service_name = pw.CharField(index=True)
     timestamp = pw.DateTimeField(default=datetime.datetime.now, index=True)
-    body = pw.TextField(null=True)
+    body = pw.TextField(default=str)
     # Note that the binary JSON type only works with Postgres 9.4 or later.
     # https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#json-support
-    attributes = BinaryJSONField(null=True)
+    attributes = BinaryJSONField(default=dict)
 
 
 @contextmanager
