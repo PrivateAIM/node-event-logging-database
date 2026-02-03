@@ -32,7 +32,7 @@ def test_create_and_delete(postgres):
         EventLog.delete().where(EventLog.event_name == event_name).execute()
         assert EventLog.select().count() == n_events
 
-        timestamp = datetime.datetime.now()
+        timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
         body = next_random_string()
         EventLog.create(event_name=event_name, service_name=service_name, timestamp=timestamp, body=body)
         assert EventLog.select().count() == n_events + 1
