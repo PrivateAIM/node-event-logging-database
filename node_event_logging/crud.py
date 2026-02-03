@@ -2,7 +2,7 @@ from contextlib import contextmanager
 import datetime
 
 import peewee as pw
-from playhouse.postgres_ext import BinaryJSONField
+from playhouse.postgres_ext import BinaryJSONField, DateTimeTZField
 from playhouse.shortcuts import ThreadSafeDatabaseMetadata
 
 from .validation import EventModelMap
@@ -44,7 +44,8 @@ class EventLog(BaseModel):
 
     event_name = pw.CharField(index=True)
     service_name = pw.CharField(index=True)
-    timestamp = pw.DateTimeField(default=datetime.datetime.now, index=True)
+    # Note that the date time field that is aware of the time zone is specific to Postgres.
+    timestamp = DateTimeTZField(default=lambda: datetime.datetime.now(tz=datetime.timezone.utc), index=True)
     body = pw.TextField(default=str)
     # Note that the binary JSON type only works with Postgres 9.4 or later.
     # https://docs.peewee-orm.com/en/latest/peewee/playhouse.html#json-support
