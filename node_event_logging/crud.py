@@ -69,6 +69,8 @@ class EventLog(BaseModel):
 
 def init_db(db: pw.Database):
     """Initializes a configured database with the help of the database proxy that is already bound to the models."""
+    if proxy.obj is not None:
+        raise pw.PeeweeException("Database proxy is already initialized.")
     proxy.initialize(db)
     with db:
         # Create tables if they do not exist yet.

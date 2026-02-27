@@ -1,10 +1,11 @@
 import datetime
 import uuid
 
+import peewee as pw
 import pytest
 from pydantic import ValidationError
 
-from node_event_logging import AttributesModel, EventLog, EventModelMap
+from node_event_logging import AttributesModel, EventLog, EventModelMap, init_db
 from .common.helpers import next_random_string, next_uuid
 
 
@@ -17,6 +18,11 @@ def test_columns(postgres):
     with postgres:
         columns = [column.name for column in EventLog.select().selected_columns]
         assert columns == ["id", "event_name", "service_name", "timestamp", "body", "attributes"]
+
+
+def test_proxy_init_error(postgres):
+    with pytest.raises(pw.PeeweeException):
+        init_db(postgres)
 
 
 def test_create_and_delete(postgres):
