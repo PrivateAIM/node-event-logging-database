@@ -15,4 +15,5 @@ def postgres():
         port=postgres_port(),
     )
     init_db(db)
-    return db
+    yield db
+    db.close()
