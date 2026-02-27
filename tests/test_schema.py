@@ -1,26 +1,32 @@
 import datetime
 import uuid
 
+import peewee as pw
 import pytest
 from pydantic import ValidationError
 
-from node_event_logging import AttributesModel, bind_to, EventLog, EventModelMap
+from node_event_logging import AttributesModel, EventLog, EventModelMap, init_db
 from .common.helpers import next_random_string, next_uuid
 
 
 def test_database(postgres):
-    with bind_to(postgres):
+    with postgres:
         assert EventLog.table_exists() is True
 
 
 def test_columns(postgres):
-    with bind_to(postgres):
+    with postgres:
         columns = [column.name for column in EventLog.select().selected_columns]
         assert columns == ["id", "event_name", "service_name", "timestamp", "body", "attributes"]
 
 
+def test_proxy_init_error(postgres):
+    with pytest.raises(pw.PeeweeException):
+        init_db(postgres)
+
+
 def test_create_and_delete(postgres):
-    with bind_to(postgres):
+    with postgres:
         n_events = EventLog.select().count()
         event_name, service_name = next_random_string(), next_random_string()
         EventLog.create(event_name=event_name, service_name=service_name)
@@ -53,7 +59,7 @@ def test_validating_attributes(monkeypatch, postgres):
     event_name = next_random_string()
     monkeypatch.setattr(EventModelMap, "mapping", {event_name: AttributesModelTest})
 
-    with bind_to(postgres):
+    with postgres:
         with pytest.raises(ValidationError):
             EventLog.create(
                 event_name=next_random_string(),

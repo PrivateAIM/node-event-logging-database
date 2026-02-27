@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 import datetime
 
 import peewee as pw
@@ -8,8 +7,12 @@ from playhouse.shortcuts import ThreadSafeDatabaseMetadata
 from .validation import EventModelMap
 
 
+proxy = pw.DatabaseProxy()
+
+
 class BaseModel(pw.Model):
     class Meta:
+        database = proxy
         model_metadata_class = ThreadSafeDatabaseMetadata
 
 
@@ -61,12 +64,14 @@ class EventLog(BaseModel):
             if not isinstance(attributes, dict):
                 raise ValueError(f"'attributes' need to be a dictionary, got {type(attributes)}.")
             model(**attributes)
-        super().create(**query)
+        return super().create(**query)
 
 
-@contextmanager
-def bind_to(db: pw.Database):
-    with db.bind_ctx((EventLog,)):
+def init_db(db: pw.Database):
+    """Initializes a configured database with the help of the database proxy that is already bound to the models."""
+    if proxy.obj is not None:
+        raise pw.PeeweeException("Database proxy is already initialized.")
+    proxy.initialize(db)
+    with db:
         # Create tables if they do not exist yet.
         db.create_tables((EventLog,))
-        yield
