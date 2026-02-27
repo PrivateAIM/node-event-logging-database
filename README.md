@@ -15,10 +15,11 @@ pip install git+https://github.com/PrivateAIM/node-event-logging-database.git@v0
 
 ```python
 import peewee as pw
-from node_event_logging import bind_to, EventLog
+from node_event_logging import EventLog, init_db
 
 postgres = pw.PostgresqlDatabase("my_database", user="...", password="...", host="...", port="...")
-with bind_to(postgres):
+init_db(postgres)  # Binds EventLog to the database and creates the table if it doesn't exist.
+with postgres.atomic():
     EventLog.create(event_name="test_event", service_name="random_service")
 ```
 
