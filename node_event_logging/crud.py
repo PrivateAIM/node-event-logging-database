@@ -64,7 +64,7 @@ class EventLog(BaseModel):
             if not isinstance(attributes, dict):
                 raise ValueError(f"'attributes' need to be a dictionary, got {type(attributes)}.")
             model(**attributes)
-        super().create(**query)
+        return super().create(**query)
 
 
 def init_db(db: pw.Database):
